@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .weather-card {
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    .search-box input {
+      border-radius: 30px 0 0 30px;
+    }
+    .search-box button {
+      border-radius: 0 30px 30px 0;
+    }
+    .label {
+      font-weight: 600;
+      color: #333;
+    }
+    .value {
+      font-weight: 500;
+      color: #0d6efd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Search Section -->
+    <div class="row mb-4 justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="input-group search-box shadow">
+          <input type="text" id="txtCity" placeholder="Enter city name" class="form-control">
+          <button onclick="SearchClick()" class="btn btn-primary">Search</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weather Info Card -->
+    <div class="card weather-card p-4" id="weatherCard" style="display:none;">
+      <div class="card-body">
+        <h3 class="text-center mb-4" id="lblCity"></h3>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <span class="label">Country: </span><span class="value" id="lblCountry"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Coordinates: </span>
+            <span class="value">Lat <span id="lblLat"></span>, Lon <span id="lblLon"></span></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Condition: </span><span class="value" id="lblCondition"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Description: </span><span class="value" id="lblDesc"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Temperature: </span><span class="value" id="lblTemp"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Feels Like: </span><span class="value" id="lblFeels"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Max Temp: </span><span class="value" id="lblMaxTemp"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Min Temp: </span><span class="value" id="lblMinTemp"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Pressure: </span><span class="value" id="lblPress"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Humidity: </span><span class="value" id="lblHumid"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Wind Speed: </span><span class="value" id="lblWind"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Cloudiness: </span><span class="value" id="lblClouds"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Visibility: </span><span class="value" id="lblVisibility"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Sunrise: </span><span class="value" id="lblSunrise"></span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <span class="label">Sunset: </span><span class="value" id="lblSunset"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var cityName = '';
+
+    function LoadWeatherData() {
+      var api_Key = "78d89c146edcd589373c75cb0e102c7a";
+      var url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${api_Key}&units=metric`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+
+          // Show card
+          document.getElementById("weatherCard").style.display = "block";
+
+          // Fill data
+          document.getElementById("lblCity").innerText = data.name;
+          document.getElementById("lblCountry").innerText = data.sys.country;
+          document.getElementById("lblLat").innerText = data.coord.lat;
+          document.getElementById("lblLon").innerText = data.coord.lon;
+          document.getElementById("lblCondition").innerText = data.weather[0].main;
+          document.getElementById("lblDesc").innerText = data.weather[0].description;
+          document.getElementById("lblTemp").innerHTML = `${Math.round(data.main.temp)} °C`;
+          document.getElementById("lblFeels").innerHTML = `${Math.round(data.main.feels_like)} °C`;
+          document.getElementById("lblMaxTemp").innerHTML = `${data.main.temp_max} °C`;
+          document.getElementById("lblMinTemp").innerHTML = `${data.main.temp_min} °C`;
+          document.getElementById("lblPress").innerText = data.main.pressure + " hPa";
+          document.getElementById("lblHumid").innerText = data.main.humidity + " %";
+          document.getElementById("lblWind").innerText = data.wind.speed + " m/s";
+          document.getElementById("lblClouds").innerText = data.clouds.all + " %";
+          document.getElementById("lblVisibility").innerText = (data.visibility / 1000) + " km";
+          let sunrise = new Date(data.sys.sunrise * 1000);
+          let sunset = new Date(data.sys.sunset * 1000);
+          document.getElementById("lblSunrise").innerText = sunrise.toLocaleTimeString();
+          document.getElementById("lblSunset").innerText = sunset.toLocaleTimeString();
+        })
+        .catch(error => {
+          console.error("Error fetching weather data:", error);
+          alert("City not found. Please try again.");
+        });
+    }
+
+    function SearchClick() {
+      cityName = document.getElementById("txtCity").value;
+      if (cityName.trim() !== "") {
+        LoadWeatherData();
+      } else {
+        alert("Please enter a city name.");
+      }
+    }
+  </script>
+
+</body>
+</html>
